@@ -1,0 +1,11 @@
+!DOCTYPE[html];
+html[lang="tr"]{
+    head{
+        title{BINX}
+    }
+    body{
+        h1#tag-id.tag-class[style="color:yellow;" class="tag-class2"]{
+            \tbinx is\s not\nxml
+        }
+    }
+}
