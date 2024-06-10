@@ -1,5 +1,5 @@
 # binx
-Binx file to xml compiler.
+Binx file to xml/html compiler.
 
 Binx is not a programing language. It's just a simple document formating style.
 
