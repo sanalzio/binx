@@ -2,7 +2,7 @@
 
 ## 🐧 For GNU-Linux / macOS
 
-1) Download the executable file suitable for your system from the [releases page](releases/latest).
+1) Download the executable file suitable for your system from the [releases page](https://github.com/sanalzio/binx/releases/latest).
 2) Rename downloaded file to `binx`.
 3) Open a terminal in the directory where the downloaded file is located.
 4) Run this commands in terminal:<br>
@@ -14,7 +14,7 @@
 
 ## For Windows
 
-1) [Click here to download binx executable for windows.](/releases/latest/download/binx-windows-x64.exe)
+1) [Click here to download binx executable for windows.](https://github.com/sanalzio/binx/releases/latest/download/binx-windows-x64.exe)
 2) Rename downloaded file to `binx`.
 3) Cut file.
 4) Paste to `C:\Windows\System32\` directory.
