@@ -60,7 +60,7 @@ console.log(compiled.type, compiled.output);
     If output not specified, writes to stdout.
 
 - `serve` or `s`<br>
-    serves binx file on local host.
+    serves path on local host.
 
 - `version`<br>
     print binx version
@@ -77,12 +77,12 @@ $ binx compile /path/to/input.bx
 # writes output to output file
 $ binx c /path/to/input.bx /path/to/output.html
 
-# compiles and serves binx file on local host
-$ binx serve /path/to/input.bx
+# compiles and serves path on local host
+$ binx serve /path/
 
-# compiles and serves binx file on local host with spesific port
+# compiles and serves path on local host with spesific port
 # default is 8080
-$ binx serve /path/to/input.bx 3000
+$ binx serve /path/ 3000
 ```
 
 # Writing binx document.
