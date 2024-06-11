@@ -9,8 +9,9 @@
     $ sudo mv "./<downloaded-file-name>" /bin/binx
     $ chmod +x /bin/binx
     ```
-    > [!IMPORTANT]
-    > Replace `<downloaded-file-name>` with downloaded file name
+
+> [!IMPORTANT]
+> Replace `<downloaded-file-name>` with downloaded file name
 4) It's all done. Enjoy.
 
 ## For Windows
