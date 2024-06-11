@@ -3,14 +3,15 @@
 ## 🐧 For GNU-Linux / macOS
 
 1) Download the executable file suitable for your system from the [releases page](https://github.com/sanalzio/binx/releases/latest).
-2) Rename downloaded file to `binx`.
-3) Open a terminal in the directory where the downloaded file is located.
-4) Run this commands in terminal:<br>
+2) Open a terminal in the downloaded file directory.
+3) Run this commands in terminal:<br>
     ```bash
-    $ sudo mv ./binx /bin
+    $ sudo mv "./<downloaded-file-name>" /bin/binx
     $ chmod +x /bin/binx
     ```
-5) It's all done. Enjoy.
+    > [!IMPORTANT]
+    > Replace `<downloaded-file-name>` with downloaded file name
+4) It's all done. Enjoy.
 
 ## For Windows
 
