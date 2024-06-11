@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "description": "My syntax rules to xml compiler.",
   "keywords": [],
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "scripts": {
     "test": "bun ./src/test.js",
     "test_build": "bun build --compile --minify ./src/index.js --outfile binx",
