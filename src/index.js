@@ -1,14 +1,19 @@
 export function compile(content) {
 
-    // asign input to text variable
-    let text = content;
+    let 
+        // asign input to text variable
+        text = content,
+        // create type variable
+        type = "xml";
 
-    // define object type variable for regexp
+    // define object variable for regexp
     const regExps = {
 
         comment: /```(?<inner>.*?)```/s,
 
         exclamationTags: /(?<tagName>![\w-]*?)\[(?<attrs>[^\[\]]*)\]/s,
+
+        doctype: /\!doctype\[(?<type>[^\[\]]*)\]/si,
 
         questionTags: /(?<tagName>\?[\w-]*?)(?<attrs>\[[^\[\]]*\])?\{(?<inner>[^\{\}]*)\}/s,
 
@@ -27,6 +32,9 @@ export function compile(content) {
         newLine: /[^\\](\\n)/s,
 
     }
+
+    // get document type form doctype tag and chanage type variable
+    text.match(regExps.doctype) ? type = text.match(regExps.doctype)[1] : type = "xml";
 
     // compile comments
     while (text.match(regExps.comment)) {
@@ -227,14 +235,15 @@ export function compile(content) {
 
     }
 
-    return text;
+    return { output: text, type: type.toLowerCase() };
 }
 
 // import package.json file
 import pkg from "../package.json";
 
 // If module is called directly
-if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
+if(Bun.pathToFileURL(process.argv[1]).href == Bun.pathToFileURL(import.meta.path.replaceAll("\\", "/")).href){
+
     // compile binx file into xml/html
     if (process.argv[2] == "c" || process.argv[2] == "compile") {
 
@@ -246,27 +255,33 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
         if (process.argv[4]) {
 
             // write to output file
-            Bun.write(process.argv[4], compile(text));
+            Bun.write(process.argv[4], compile(text).output);
 
         }
         // else
         else {
 
             // write to stdout
-            console.log(compile(text));
+            console.log(compile(text).output);
 
         }
 
     }
+
     // serve binx file
     else if (process.argv[2] == "s" || process.argv[2] == "serve") {
 
         // import colorama module for colored stdout outputs
         const { Fore } = require("./colorama.js");
 
-        // import input file
-        const file = Bun.file(process.argv[3]);
-        const text = await file.text();
+        // asign input path to path variable
+        let path = process.argv[3].replaceAll("\\", "/");
+        if (path.endsWith("/")) {
+            path = path.slice(0, -1);
+        }
+        
+        // create browser url for input path
+        const pathURL = Bun.pathToFileURL(process.argv[3].replaceAll("\\", "/")).href;
 
         // serve binx file
         const server = Bun.serve({
@@ -277,21 +292,80 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
             // define function to be called when a request is made
             async fetch(req) {
 
-                // return response
-                return new Response(
+                // asign req.url variable to url to variable
+                const url = new URL(req.url);
 
-                    // compile binx file into xml/html
-                    compile(text),
+                // if request is for root
+                if (url.pathname === "/") {
 
-                    {
-                        headers: {
-                            // set content type
-                            "Content-Type": "text/html",
-                        },
+                    // try to import index.bx file
+                    const file = Bun.file(path+"/index.bx");
+
+                    // check if file exists
+                    const fileExists = await file.exists();
+
+                    // if file exists
+                    if (fileExists) {
+
+                        // read file content and asign to text variable
+                        const text = await file.text();
+
+                        // compile binx file into html
+                        const compiled = compile(text);
+
+                        // return response
+                        return new Response(
+
+                            compiled.output,
+
+                            {
+                                headers: {
+                                    // set content type
+                                    "Content-Type": "text/html",
+                                },
+                            }
+
+                        );
+                    } else {
+
+                        // return response
+                        return new Response("This is a binx server. Start with request any file.");
                     }
+                }
+                // else if request is for file
+                else {
 
-                );
+                    // import requested file
+                    const file = Bun.file(path+url.pathname);
+                    const text = await file.text();
 
+                    // if request is for binx file
+                    if (url.pathname.toLowerCase().endsWith(".bx")) {
+
+                        // compile binx file into xml/html
+                        const compiled = compile(text);
+
+                        // return response
+                        return new Response(
+
+                            // compile binx file into xml/html
+                            compiled.output,
+
+                            {
+                                headers: {
+                                    // set content type
+                                    "Content-Type": "text/"+compiled.type,
+                                },
+                            }
+
+                        );
+                    }
+                    else {
+
+                        // return response
+                        return new Response(file);
+                    }
+                }
             },
 
         });
@@ -309,6 +383,7 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
    └──────────────────────────────────────────┘${Fore.Reset}
         `);
     }
+
     // print binx version
     else if(process.argv[2] == "v" || process.argv[2] == "version") {
 
@@ -319,6 +394,7 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
         console.log(`${Fore.BrightMagenta}BINX ${Fore.Magenta}${pkg.version}${Fore.Reset}`);
     
     }
+
     // show help
     else {
 
@@ -332,13 +408,13 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
   ${Fore.Cyan} Flags${Fore.Reset}:
     ${Fore.BrightBlue}compile / c ${Fore.Reset}: ${Fore.Cyan}compiles binx file into xml/html.${Fore.Reset}
                   ${Fore.Cyan}if output not specified, writes to stdout.${Fore.Reset}
-    ${Fore.BrightBlue}serve / s ${Fore.Reset}: ${Fore.Cyan}serves binx file on local host.${Fore.Reset}
+    ${Fore.BrightBlue}serve / s ${Fore.Reset}: ${Fore.Cyan}serves path on local host.${Fore.Reset}
     ${Fore.BrightBlue}version / v ${Fore.Reset}: ${Fore.Cyan}prints binx version.${Fore.Reset}
     ${Fore.BrightBlue}help / h ${Fore.Reset}: ${Fore.Cyan}shows this message.${Fore.Reset}
 
   ${Fore.Cyan} Usage${Fore.Reset}:
    ${Fore.Yellow} compile${Fore.Reset}: ${Fore.BrightBlue}binx${Fore.BrightRed} compile ${Fore.Green}[input] [output${Fore.Yellow}*${Fore.Green}]${Fore.Reset}
-   ${Fore.Yellow} serve${Fore.Reset}: ${Fore.BrightBlue}binx${Fore.BrightRed} serve ${Fore.Green}[input] [port${Fore.Yellow}*${Fore.Green}]${Fore.Reset}
+   ${Fore.Yellow} serve${Fore.Reset}: ${Fore.BrightBlue}binx${Fore.BrightRed} serve ${Fore.Green}[path] [port${Fore.Yellow}*${Fore.Green}]${Fore.Reset}
    ${Fore.Yellow} help${Fore.Reset}: ${Fore.BrightBlue}binx${Fore.BrightRed} help ${Fore.Reset}
    ${Fore.Yellow} version${Fore.Reset}: ${Fore.BrightBlue}binx${Fore.BrightRed} version ${Fore.Reset}
 
@@ -347,8 +423,8 @@ if(process.argv[1] == import.meta.path.replaceAll("\\", "/")){
   ${Fore.Cyan} Examples${Fore.Reset}:
    ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} c ${Fore.Green}"./examples/example.bx"${Fore.Reset}
    ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} compile ${Fore.Green}"./examples/example.bx" "./examples/example.html"${Fore.Reset}
-   ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} s ${Fore.Green}"./examples/example.bx"${Fore.Reset}
-   ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} s ${Fore.Green}"./examples/example.bx 3000"${Fore.Reset}
+   ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} serve ${Fore.Green}"./examples/"${Fore.Reset}
+   ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} s ${Fore.Green}"./examples/" 3000${Fore.Reset}
    ${Fore.Magenta} $ ${Fore.BrightBlue}binx${Fore.BrightRed} version ${Fore.Reset}
         `);
 

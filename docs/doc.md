@@ -10,6 +10,7 @@ Binx syntax similar to xml syntax. Anyone knows xml syntax can easily write a bi
   - [flags](#flags)
   - [examples](#examples)
 - [Writing binx document.](#writing-binx-document)
+  - [Specify document type](#specify-document-type)
   - [Normal tags](#normal-tags)
   - [Self-closed tags](#self-closed-tags)
   - [Non Self-closed tags](#non-self-closed-tags)
@@ -35,8 +36,7 @@ import { compile } from "/path/to/binx/index.js";
 ## Usage `compile` function
 
 ```js
-console.log(
-    compile(`!DOCTYPE[html]
+const compiled = compile(`!DOCTYPE[html]
 html[lang="tr"]{
     head{
         title{BINX}
@@ -48,7 +48,7 @@ html[lang="tr"]{
     }
     script[src="./script.js"]{}
 }`);
-)
+console.log(compiled.type, compiled.output);
 ```
 
 # CLI
@@ -86,6 +86,16 @@ $ binx serve /path/to/input.bx 3000
 ```
 
 # Writing binx document.
+
+> [!IMPORTANT]
+> Document type specifying is required on document start.
+
+## Specify document type
+
+```html
+``` Document start ```
+!DOCTYPE[html]
+```
 
 ## Normal tags
 

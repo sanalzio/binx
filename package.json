@@ -1,6 +1,6 @@
 {
   "name": "binx",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "",
   "main": "./src/index.js",
   "description": "My syntax rules to xml compiler.",
@@ -11,6 +11,6 @@
     "test_build": "bun build --compile --minify ./src/index.js --outfile binx",
     "build": "bash ./scripts/build.sh",
     "compile_example": "bun ./src/index.js compile ./examples/example.bx ./examples/example.html",
-    "serve_example": "bun ./src/index.js serve ./examples/example.bx"
+    "serve_example": "bun ./src/index.js serve ./examples/"
   }
 }

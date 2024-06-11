@@ -11,4 +11,4 @@ html[lang="tr"]{
         }
     }
     script[src="./script.js"]{}
-}`));
+}`).output);
