@@ -99,6 +99,12 @@ $ binx serve /path/ 3000
 
 ## Normal tags
 
+### IMPORTANT
+
+> [!IMPORTANT]
+> The ID must always be specified before the class.
+> And binx does not supports inline JavaScript and CSS coding.
+
 ### in xml
 
 ```xml
